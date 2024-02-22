@@ -25,3 +25,11 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.food-card{
+  @apply text-center items-center flex flex-col bg-white/10 p-4 rounded-md w-full md:max-w-md gap-4
+}
+
+.arc-text {
+ 
+}
