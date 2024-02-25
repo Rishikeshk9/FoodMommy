@@ -1,17 +1,39 @@
 "use client"
-import Button from '@/app/components/Button'
-import React from 'react'
-import CustomButton from '@/app/components/EatButton'
+// pages/join-group.js
+import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import { useSupabaseContext } from '@/app/context/SupabaseProvider';
 
-function groupdetails() {
+export default function JoinGroup() {
+  const [groupId, setGroupId] = useState('');
+ 
+  const supabaseStore = useSupabaseContext();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+   const { data,error } = await supabaseStore.addUserToGroup(groupId);
+      console.log('Joined group:', data);
+      console.error('Error joining group:', error);
+      // Redirect to group page or show success message
+     // router.push(`/group/${groupId}`);
+    } catch (error) {
+      console.error('Error joining group:', error);
+    }
+  };
+
   return (
-    <div className='flex   w-full h-screen justify-center align-middle items-center flex-col gap-4 bg-slate-900'>
-          
-    <input  type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs focus:ring-0 focus:outline-0" /> 
-     <Button   type="primary" text={"Join"} />
-     
-    </div> 
-  )
+    <form onSubmit={handleSubmit} className='flex flex-col gap-2 p-4'>
+      <input
+        type="text"
+        value={groupId}
+        onChange={(e) => setGroupId(e.target.value)}
+        placeholder="Group ID"
+        required
+        className='input input-bordered w-full  '
+      />
+      <button type="submit"  className='btn btn-primary'>Join Group</button>
+    </form>
+  );
 }
-
-export default groupdetails

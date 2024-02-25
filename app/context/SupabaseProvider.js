@@ -19,8 +19,8 @@ export default function SupabaseStore  ({ children } ){
   }, [supabase]);
 
   // CRUD operations
-  const createUser = async (username, email) => {
-    return await supabase.from('Users').insert([{ username, email }]) .select();
+  const createUser = async (  email) => {
+    return await supabase.from('users').insert([{  email }]) .select();
   };
 
   const addFoodItem = async (name) => {
@@ -28,68 +28,131 @@ export default function SupabaseStore  ({ children } ){
     return await supabase.from('FoodItems').insert([{ name }]) .select();
 
   };
-  const addItemToUser = async (itemId, userID, type, when) => {
-    // Fetch the current user's data to access the current state of the meal plan
-    let { data: userData, error: fetchError } = await supabase
-      .from('Users')
-      .select(type)
-      .eq('email', userID) // Adjust the column name if necessary
-      .single();
+
+  const fetchAllFoodItems = async()=>{
+ 
+    return await supabase?.from('fooditems').select();
+  }
+
+  const fetchUserPreferences = async (userID) => {
+    try {
+        // Fetch user's meal preferences along with food item details
+        const { data: preferences, error } = await supabase
+            .from('usermealpreferences')
+            .select(`
+                preference_id,
+                meal_type,
+                time_of_week,
+                fooditems (food_name)
+            `)
+            .eq('email_id', userID);
+
+        if (error) {
+            console.error('Error fetching user preferences:', error);
+            return null;
+        }
+
+        
+
+        return preferences;
+    } catch (error) {
+        console.error('An error occurred while fetching user preferences:', error);
+        return null;
+    }
+};
+
   
+  const addItemToUser = async (foodItemId, userID, type, when) => {
+    // Input validation remains the same...
+
+    // Attempt to fetch existing preference
+    // Adjusted to check for existing food item preference
+    let { data: existingPreference, error: fetchError } = await supabase
+        .from('usermealpreferences')
+        .select('*')
+        .eq('email_id', userID)
+        .eq('food_item_id', foodItemId) // Now checking against food_item_id
+        .eq('meal_type', type)
+        .eq('time_of_week', when)
+        .maybeSingle(); // Adjusted method for potential null result without throwing an error
+
     if (fetchError) {
-      console.error('Error fetching user data:', fetchError);
-      return null;
+        console.error('Error fetching user meal preference:', fetchError);
+        return null;
     }
-  
-    // Ensure the user's meal plan for the given type exists and is an object
-    let mealPlan = userData[type] ? JSON.parse(userData[type]) : {};
-    
-    // Initialize the `when` key if not already present
-    if (!mealPlan[when]) {
-      mealPlan[when] = {};
+
+    // If no existing preference, insert new
+    if (!existingPreference) {
+        const { data: insertData, error: insertError } = await supabase
+            .from('usermealpreferences')
+            .insert([
+                { email_id: userID, food_item_id: foodItemId, meal_type: type, time_of_week: when }
+            ]);
+        if (insertError) {
+            console.error('Error inserting user meal preference:', insertError);
+            return null;
+        }
+        return insertData;
     }
-  
-    // Assuming itemId is a string representing the food item's name
-    // Initialize the set for the given 'when' if it doesn't exist, otherwise add the item
-    if (!mealPlan[when][itemId]) {
-      mealPlan[when][itemId] = true; // Using an object to simulate a set, ensuring unique items
-    }
-  
-    // Convert the updated meal plan back to a string for storage
-    const updatedMealPlan =  mealPlan ;
-  
-    // Prepare the update object with the updated meal plan
-    const updateObject = {};
-    updateObject[type] = updatedMealPlan;
-  
-    // Perform the update operation
-    const { data: updateData, error: updateError } = await supabase
-      .from('Users')
-      .update(updateObject)
-      .match({ email: userID });
-  
-    // Handle possible errors
-    if (updateError) {
-      console.error('Error updating item:', updateError);
-      return null;
-    }
-  
-    return updateData;
-  };
-  
+    // If existing preference found, consider how to handle (update, ignore, or error out)
+    // Handling depends on app logic (e.g., are multiple entries for the same meal type & time allowed?)
+};
+
   
 
   const addFavorite = async (userId, foodItemId) => {
     return await supabase.from('UserFavorites').insert([{ user_id: userId, food_item_id: foodItemId }]) .select();
   };
 
-  const createGroup = async (name, createdBy) => {
-    return await supabase.from('Groups').insert([{ name, created_by: createdBy }]) .select();
+  const createGroup = async (name) => {
+ 
+    return await supabase?.from('groups').insert([{  group_name: name, created_by:  user?.email }]) .select();
   };
 
-  const addUserToGroup = async (groupId, userId) => {
-    return await supabase.from('GroupMembers').insert([{ group_id: groupId, user_id: userId }]) .select();
-  };
+  const fetchAllGroupsImMemberOf = async (userId) => {
+    return await supabase?.from('groupmemberships').select('groups (group_name,group_id)').eq('email_id', userId);
+  }
+
+  const fetchAllGroups = async () => {
+    return await supabase?.from('groups').select('*');
+  }
+
+
+  const addUserToGroup = async (groupId) => {
+    // First, check if the user is already a member of the group
+    const { data: existingMembership, error: membershipError } = await supabase
+        .from('groupmemberships')
+        .select()
+        .eq('group_id', groupId)
+        .eq('email_id', user?.email)
+        .maybeSingle(); // Use maybeSingle() if you expect 0 or 1 record
+
+    // Handle any errors during the check
+    if (membershipError) {
+        console.error('Error checking group membership:', membershipError);
+        return { error: membershipError };
+    }
+
+    // If the user is already a member, return or handle as needed
+    if (existingMembership) {
+        return { error: new Error('User is already a member of the group.') };
+    }
+
+    // If the user is not already a member, proceed to add them to the group
+    const { data, error } = await supabase
+        .from('groupmemberships')
+        .insert([{ group_id: groupId, email_id: user?.email }]);
+
+    // Handle any errors during the insert operation
+    if (error) {
+        console.error('Error adding user to group:', error);
+        return { error };
+    }
+
+    // Return success data or other confirmation as needed
+    return { data, error };
+};
+
 
   const getGroupRecommendations = async (groupId) => {
     // Implement the logic for group recommendations
@@ -100,6 +163,9 @@ export default function SupabaseStore  ({ children } ){
       provider: 'google',
       
     });
+
+    // fetchUser();
+    // createUser(data?.user?.email);
   
     if (error) {
       console.error('Error during sign-in:', error);
@@ -112,7 +178,7 @@ export default function SupabaseStore  ({ children } ){
   const fetchUser = async ()=>{
 
 
-     const { data: { user } } = await supabase?.auth?.getUser()
+     const { data: { user } } = await supabase?.auth?.getUser();
 
     setUser(user);  
     return user;
@@ -134,8 +200,12 @@ export default function SupabaseStore  ({ children } ){
           addUserToGroup,
           getGroupRecommendations,
           signInWithGoogle,
+          fetchUserPreferences,
           fetchUser,
+          fetchAllGroupsImMemberOf,
           signOut,
+          fetchAllFoodItems,
+          fetchAllGroups,
           user}}>
             {children}
         </SupabaseContext.Provider>
