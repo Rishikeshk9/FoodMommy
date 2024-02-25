@@ -36,15 +36,17 @@ function Home() {
       // Assuming items array now contains food_item_ids selected by the user
       supaStore.addItemToUser(
         foodItem.food_item_id,
-        supaStore.user.email,
+        supaStore.user.id,
         String(selectedCategory).toLowerCase(),
         String(selectedDay).toLowerCase()
       );
     });
+
+    fetchUserPreferences();
   }
 
   function fetchUserPreferences() {
-    supaStore.fetchUserPreferences(supaStore?.user?.email).then((data) => {
+    supaStore.fetchUserPreferences(supaStore?.user?.id).then((data) => {
       if (data.length > 0) setUserPreferences(data);
       console.log(data);
     });
@@ -62,7 +64,7 @@ function Home() {
     fetchUserPreferences();
 
     return () => {};
-  }, [supaStore, supaStore?.user?.email]);
+  }, [ supaStore?.user?.id]);
 
   return (
     <>

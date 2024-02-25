@@ -41,12 +41,26 @@ function Home() {
     }
   }, [ ])
 
+
+  const fetchMyGroups = async () => {
+    const { data, error } = await supabaseStore.fetchAllGroupsImMemberOf(supabaseStore?.user?.id);
+    if (error) {
+      console.error('Error fetching groups:', error);
+      return null;
+    }
+    console.log('Groups:', data);
+    setGroups(data);
+  };
+
+
   useEffect(() => {
-    supabaseStore.fetchAllGroupsImMemberOf(supabaseStore?.user?.email).then((data) => {
-      console.log('Groups:', data);
-      setGroups(data?.data);
-    });
+    console.log(supabaseStore?.user);
+    // supabaseStore.fetchAllGroupsImMemberOf(supabaseStore?.user?.id).then((data) => {
+    //   console.log('Groups:', data);
+    //   setGroups(data?.data);
+    // });
   
+    fetchMyGroups();
     supabaseStore.fetchAllGroups().then((data) => {
       console.log('All Groups:', data);
       setSomeGroups(data?.data);
@@ -118,7 +132,7 @@ function Home() {
               </div>
             </div>
           </div>}
-          {groups?.length===0 && <><p className='p-3 bg-info/80 rounded'>Join a group to get started</p>
+          {groups && groups?.length===0 && <><p className='p-3 bg-info/80 rounded'>Join a group to get started</p>
 <hr/>
 <p>Top Food Communities </p>
           <div className='  flex flex-col'>
@@ -141,7 +155,7 @@ function Home() {
                   </div></div>
                 </div>
                 </div>
-                <button className='btn btn-primary' onClick={async()=>{await supabaseStore.addUserToGroup(group.group_id)}}>Join</button>
+                <button className='btn btn-primary' onClick={async()=>{await supabaseStore.addUserToGroup(group.group_id);fetchMyGroups();}}>Join</button>
               </div>
             )) }
           </div></>}

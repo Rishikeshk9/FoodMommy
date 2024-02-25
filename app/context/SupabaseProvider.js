@@ -4,7 +4,7 @@ import React, {useState, useEffect, createContext, useContext} from 'react';
  
 import { useSupabaseInit } from '@/app/api'
 import { data } from 'autoprefixer';
-
+ 
 export const SupabaseContext = createContext('');
 
 export default function SupabaseStore  ({ children } ){
@@ -14,14 +14,49 @@ export default function SupabaseStore  ({ children } ){
     const [user,setUser] = useState();
     
   useEffect(() => {
-    if (supabase){ setIsReady(true);
-    fetchUser();};
+    if (supabase) {
+      setIsReady(true);
+      fetchUser();
+    }
   }, [supabase]);
 
   // CRUD operations
-  const createUser = async (  email) => {
-    return await supabase.from('users').insert([{  email }]) .select();
-  };
+
+  // Create a new user profile in the database only if it doesn't exist
+  const createUser = async (userId) => {
+    // First, check if the user already exists in the profiles table
+    const { data: existingUser, error: fetchError } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .maybeSingle(); // Use maybeSingle() to expect 0 or 1 record
+
+    // Handle any errors during the fetch operation
+    if (fetchError) {
+        console.error('Error checking for existing user:', fetchError);
+        return { error: fetchError };
+    }
+
+    // If the user already exists, return a message or handle as needed
+    if (existingUser) {
+        return { error: new Error('User already exists.') };
+    }
+
+    // If the user does not exist, proceed to insert the new user record
+    const { data, error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ id: userId }])
+        .single(); // Use single() if inserting one record to return just that record
+
+    // Handle any errors during the insert operation
+    if (insertError) {
+        console.error('Error creating new user:', insertError);
+        return { error: insertError };
+    }
+
+    // Return the newly created user data
+    return { data };
+};
 
   const addFoodItem = async (name) => {
     
@@ -45,7 +80,7 @@ export default function SupabaseStore  ({ children } ){
                 time_of_week,
                 fooditems (food_name)
             `)
-            .eq('email_id', userID);
+            .eq('user_id', userID);
 
         if (error) {
             console.error('Error fetching user preferences:', error);
@@ -70,7 +105,7 @@ export default function SupabaseStore  ({ children } ){
     let { data: existingPreference, error: fetchError } = await supabase
         .from('usermealpreferences')
         .select('*')
-        .eq('email_id', userID)
+        .eq('user_id', userID)
         .eq('food_item_id', foodItemId) // Now checking against food_item_id
         .eq('meal_type', type)
         .eq('time_of_week', when)
@@ -86,7 +121,7 @@ export default function SupabaseStore  ({ children } ){
         const { data: insertData, error: insertError } = await supabase
             .from('usermealpreferences')
             .insert([
-                { email_id: userID, food_item_id: foodItemId, meal_type: type, time_of_week: when }
+                { user_id: userID, food_item_id: foodItemId, meal_type: type, time_of_week: when }
             ]);
         if (insertError) {
             console.error('Error inserting user meal preference:', insertError);
@@ -106,11 +141,11 @@ export default function SupabaseStore  ({ children } ){
 
   const createGroup = async (name) => {
  
-    return await supabase?.from('groups').insert([{  group_name: name, created_by:  user?.email }]) .select();
+    return await supabase?.from('groups').insert([{  group_name: name, created_by:  user?.id }]) .select();
   };
 
   const fetchAllGroupsImMemberOf = async (userId) => {
-    return await supabase?.from('groupmemberships').select('groups (group_name,group_id)').eq('email_id', userId);
+    return await supabase?.from('groupmemberships').select('groups (group_name,group_id)').eq('user_id', userId);
   }
 
   const fetchAllGroups = async () => {
@@ -124,7 +159,7 @@ export default function SupabaseStore  ({ children } ){
         .from('groupmemberships')
         .select()
         .eq('group_id', groupId)
-        .eq('email_id', user?.email)
+        .eq('user_id', user?.id)
         .maybeSingle(); // Use maybeSingle() if you expect 0 or 1 record
 
     // Handle any errors during the check
@@ -141,7 +176,7 @@ export default function SupabaseStore  ({ children } ){
     // If the user is not already a member, proceed to add them to the group
     const { data, error } = await supabase
         .from('groupmemberships')
-        .insert([{ group_id: groupId, email_id: user?.email }]);
+        .insert([{ group_id: groupId, user_id: user?.id }]);
 
     // Handle any errors during the insert operation
     if (error) {
@@ -159,13 +194,17 @@ export default function SupabaseStore  ({ children } ){
   };
 
   const signInWithGoogle = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+     await supabase.auth.signInWithOAuth({
       provider: 'google',
       
-    });
+    }).then (data=>{console.log(data);
+      let user = fetchUser();
+      console.log(user);
+      createUser(user?.id);
+    }).catch(error=>{console.error(error);});
 
-    // fetchUser();
-    // createUser(data?.user?.email);
+      
+    // createUser(data?.user?.id);
   
     if (error) {
       console.error('Error during sign-in:', error);
