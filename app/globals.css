@@ -18,16 +18,23 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: white;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@keyframes spinAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-400%);
+  }
+}
+.spin {
+  animation: spinAnimation 1.5s linear;
 }

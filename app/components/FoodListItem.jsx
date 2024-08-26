@@ -1,0 +1,202 @@
+'use strict';
+import React, { useEffect, useState } from 'react';
+import VoteButton from './VoteButton';
+import axios, { isCancel, AxiosError } from 'axios';
+import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { deleteFoodItem, updateFoodItem } from '../../_actions/postAction';
+
+function FoodListItem({ id, title, description, item, adminPanel }) {
+  const [image, setImage] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  useEffect(() => {
+    !image &&
+      axios
+        .get('https://www.themealdb.com/api/json/v1/1/random.php')
+        .then(function (response) {
+          setImage(response.data.meals[0].strMealThumb);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .finally(function () {
+          // always executed
+        });
+
+    return () => {};
+  }, []);
+
+  return (
+    <>
+      <FormModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        item={item}
+      />
+      <DeleteForm
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+        item={id}
+      />
+
+      <div
+        className={`  w-full   cursor-pointer  border    justify-between     transition-all duration-400   text-center align-middle items-center flex px-4 py-2 hover:bg-black/5`}
+      >
+        <div
+          className={` flex items-center align-middle  gap-2      overflow-clip `}
+        >
+          <img className='w-full h-12 rounded-full ' src={image} />
+          <p className='whitespace-nowrap'>{title}</p>
+        </div>
+        {!adminPanel ? (
+          <VoteButton title={description} />
+        ) : (
+          <div className='flex justify-between gap-2 '>
+            <IconPencil
+              onClick={() => setShowModal(true)}
+              className='text-gray-500 hover:text-blue-500 active:scale-95'
+            />
+
+            <IconTrash
+              onClick={() => setShowDeleteModal(true)}
+              className='text-gray-500 hover:text-red-500 active:scale-95 '
+            />
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default FoodListItem;
+
+function FormModal({ showModal, setShowModal, item }) {
+  const [name, setName] = useState(item.name);
+  const [description, setDescription] = useState(item.description);
+  const [imageUrl, setImageUrl] = useState(item.imageUrl);
+  const [newDetails, setNewDetails] = useState({
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
+  });
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+
+    setNewDetails((prevDetails) => ({
+      ...prevDetails,
+      name: event.target.value,
+    }));
+  };
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+    setNewDetails((prevDetails) => ({
+      ...prevDetails,
+      description: event.target.value,
+    }));
+  };
+
+  const handleImageUrlChange = (event) => {
+    setImageUrl(event.target.value);
+    setNewDetails((prevDetails) => ({
+      ...prevDetails,
+      image: event.target.value,
+    }));
+  };
+
+  const handleUpdateFoodItem = async () => {
+    console.log(item, newDetails);
+    const result = await updateFoodItem(item._id, newDetails);
+
+    if (result.success) {
+      console.log('Food item updated successfully:', result.data);
+      // Handle success (e.g., update UI, notify user)
+    } else {
+      console.error('Error updating food item:', result.errMsg);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+  return (
+    showModal && (
+      <div className='absolute top-0 flex items-center justify-center w-full h-screen mx-auto text-center align-middle md:p-4 bg-black/10 backdrop-blur-md'>
+        <div className='flex flex-col w-full gap-2 p-4 mx-auto mt-auto bg-white border md:rounded-lg border-neutral-200 text-black/80 md:max-w-md'>
+          <input
+            className='p-2 bg-white rounded'
+            type='text'
+            value={name}
+            onChange={handleNameChange}
+            placeholder='Name'
+          />
+          <input
+            className='p-2 bg-white rounded'
+            type='text'
+            value={imageUrl}
+            onChange={handleImageUrlChange}
+            placeholder='Image URL'
+          />
+          <input
+            className='p-2 bg-white rounded'
+            type='text'
+            value={description}
+            onChange={handleDescriptionChange}
+            placeholder='Description'
+          />
+
+          <div className='flex gap-2'>
+            <button
+              className='w-full   rounded p-2 text-gray-400 active:text-red-500 active:scale-[0.99] transition-all duration-100'
+              onClick={() => setShowModal(!showModal)}
+            >
+              Cancel
+            </button>
+            <button
+              className='w-full bg-green-400 rounded p-2 text-white border border-green-500 hover:bg-green-500 active:scale-[0.99] transition-all duration-100'
+              onClick={handleUpdateFoodItem}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  );
+}
+
+function DeleteForm({ showDeleteModal, setShowDeleteModal, item }) {
+  const handleDeleteFoodItem = async (foodId) => {
+    const result = await deleteFoodItem(foodId);
+
+    if (result.success) {
+      console.log('Food item deleted successfully:', result.data);
+      // Handle success (e.g., update UI, notify user)
+    } else {
+      console.error('Error deleting food item:', result.errMsg);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+  return (
+    showDeleteModal && (
+      <div className='absolute top-0 flex items-center justify-center w-full h-screen mx-auto text-center align-middle md:p-4 bg-black/10 backdrop-blur-md'>
+        <div className='flex flex-col w-full gap-2 p-4 mx-auto mt-auto bg-white border md:rounded-lg border-neutral-200 text-black/80 md:max-w-md'>
+          <p className='text-red-400'>
+            Are you sure you want to Delete {item?.name}?
+          </p>
+          <div className='flex gap-2'>
+            <button
+              className='w-full   rounded p-2 text-gray-400 active:text-green-500 active:scale-[0.99] transition-all duration-100'
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className='w-full bg-red-400 rounded p-2 text-white border border-red-500 hover:bg-red-500 active:scale-[0.99] transition-all duration-100'
+              onClick={() => handleDeleteFoodItem(item)}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  );
+}
