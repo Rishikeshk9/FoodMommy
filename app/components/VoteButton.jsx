@@ -19,28 +19,24 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
 
   const handleVote = async (vote) => {
     const voteData = {
+      _id: voteItem?._id,
       voteType: vote,
-      negativeVoters: [],
-      positiveVoters: [],
+      voter: session.user.id.toString(),
       meal: meal,
       foodItem: itemId,
       userId: session.user.id,
       groupId: groupId,
     };
-    if (vote === true) {
-      voteData.positiveVoters.push(session.user.id);
-    } else {
-      voteData.negativeVoters.push(session.user.id);
-    }
+
     console.log('POSTING VOTE', voteData);
-    saveVoteItem(voteData).then((result) => {
-      fetchVoteItems();
+    saveVoteItem(voteData).then(async (result) => {
       console.log(result);
-      if (result.success) {
-        console.log('Vote created successfully:', result.data);
+      if (result) {
+        console.log('Vote created successfully:', result);
         // Handle success (e.g., navigate to group page, notify user)
+        await fetchVoteItems();
       } else {
-        console.error('Error creating group:', result.errMsg);
+        console.error('Error creating group:', result);
         // Handle error (e.g., show error message to user)
       }
     });
@@ -52,10 +48,9 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
         <IconHeart
           onClick={() => {
             handleVote(true);
-            fetchVoteItems();
           }}
           className={`cursor-pointer  active:fill-red-500 active:scale-95 ${
-            voteItem?.positiveVoters?.includes(session?.user?.id)
+            voteItem?.voters?.includes(session?.user?.id)
               ? 'fill-red-500 text-red-600'
               : 'text-gray-600'
           }`}
@@ -63,7 +58,7 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
       </div>
       <div
         className={`cursor-pointer  active:fill-red-500 active:scale-95 ${
-          voteItem?.positiveVoters?.includes(session?.user?.id)
+          voteItem?.voters?.includes(session?.user?.id)
             ? 'fill-red-500 text-red-600'
             : 'text-gray-600'
         }`}
@@ -74,7 +69,7 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
             type: 'tween',
             duration: index + 0.2,
           })}
-          animateToNumber={voteItem?.positiveVoters?.length || 0}
+          animateToNumber={voteItem?.voters?.length || 0}
         />
       </div>
     </div>

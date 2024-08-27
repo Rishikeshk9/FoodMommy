@@ -32,6 +32,12 @@ const userSchema = new Schema(
         ref: 'food',
       },
     ],
+    groups: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'group',
+      },
+    ],
   },
   { timestamps: true }
 );

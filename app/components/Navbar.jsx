@@ -6,37 +6,28 @@ function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <nav className='sticky top-0 flex items-center justify-between w-full p-4 text-white bg-black shadow-md'>
+    <div className='sticky top-0 flex items-center justify-between w-full p-4   bg-white  border-b border-b-[#1e293b4e]  text-black'>
       <div className='flex items-center gap-4'>
         <Link className='text-xl font-bold' href='/home'>
-          Home
+          Sextortion
         </Link>
-        <Link href='/admin'>Admin</Link>
       </div>
 
       <div className='flex gap-4'>
-        {session && (
+        {session ? (
           <Link
-            className='cursor-pointer active:text-white hover:text-white text-white/50'
+            className='text-gray-500 cursor-pointer active:scale-95 hover:text-black'
             href='/home/account'
           >
             Profile
           </Link>
-        )}
-        {session ? (
-          <button
-            className='cursor-pointer active:text-white hover:text-white text-white/50'
-            onClick={() => signOut()}
-          >
-            Logout
-          </button>
         ) : (
-          <Link className='text-white/50 hover:text-white' href='/login'>
+          <Link className='text-gray-500 hover:text-black' href='/login'>
             Login
           </Link>
         )}
       </div>
-    </nav>
+    </div>
   );
 }
 

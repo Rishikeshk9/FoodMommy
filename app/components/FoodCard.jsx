@@ -11,7 +11,7 @@ function FoodCard({ groupId, meal, index, adminPanel, foodItem, voteItem }) {
   }, []);
   return (
     <div
-      className={`aspect-square    min-w-44 h-fit  shadow-md   flex-col    transition-all duration-400 rounded   text-center align-middle items-center flex justify-center bg-white`}
+      className={`aspect-square  border border-gray-50  min-w-44 h-fit  shadow    flex-col    transition-all duration-400 rounded   text-center align-middle items-center flex justify-center bg-white`}
     >
       <p className='font-semibold '>
         {foodItem.name} {index}

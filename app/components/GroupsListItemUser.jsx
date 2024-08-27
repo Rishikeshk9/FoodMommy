@@ -43,12 +43,11 @@ function GroupsListItemUser({ group }) {
         >
           <img className='w-full h-12 rounded-full ' src={image} />
         </div>
-        <div className='flex flex-col text-left'>
-          <p className='flex items-center gap-1 text-xs text-gray-400 align-middle'>
-            <IconUsers className='w-4 h-4 text-xs' /> {group?.members?.length}
+        <div className='flex gap-1 text-left'>
+          <p className='font-bold text-black/70'>{group?.name}</p>
+          <p className='flex items-center gap-1 text-xs font-semibold text-gray-400 align-middle'>
+            <IconUsers className='w-4 h-4 text-xs ' /> {group?.members?.length}
           </p>
-
-          <p className='text-xl font-bold text-black/70'>{group?.name}</p>
         </div>
       </Link>
     </>

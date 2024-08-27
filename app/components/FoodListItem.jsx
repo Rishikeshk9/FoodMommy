@@ -6,25 +6,9 @@ import { IconPencil, IconTrash } from '@tabler/icons-react';
 import { deleteFoodItem, updateFoodItem } from '../../_actions/postAction';
 
 function FoodListItem({ id, title, description, item, adminPanel }) {
-  const [image, setImage] = useState();
+  const [image, setImage] = useState(item.image);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  useEffect(() => {
-    !image &&
-      axios
-        .get('https://www.themealdb.com/api/json/v1/1/random.php')
-        .then(function (response) {
-          setImage(response.data.meals[0].strMealThumb);
-        })
-        .catch(function (error) {
-          console.log(error);
-        })
-        .finally(function () {
-          // always executed
-        });
-
-    return () => {};
-  }, []);
 
   return (
     <>
@@ -45,7 +29,7 @@ function FoodListItem({ id, title, description, item, adminPanel }) {
         <div
           className={` flex items-center align-middle  gap-2      overflow-clip `}
         >
-          <img className='w-full h-12 rounded-full ' src={image} />
+          <img className='w-20 h-12 rounded-full' src={image} />
           <p className='whitespace-nowrap'>{title}</p>
         </div>
         {!adminPanel ? (
@@ -73,11 +57,11 @@ export default FoodListItem;
 function FormModal({ showModal, setShowModal, item }) {
   const [name, setName] = useState(item.name);
   const [description, setDescription] = useState(item.description);
-  const [imageUrl, setImageUrl] = useState(item.imageUrl);
+  const [imageUrl, setImageUrl] = useState(item.image);
   const [newDetails, setNewDetails] = useState({
     name: name,
     description: description,
-    imageUrl: imageUrl,
+    image: imageUrl,
   });
   const handleNameChange = (event) => {
     setName(event.target.value);

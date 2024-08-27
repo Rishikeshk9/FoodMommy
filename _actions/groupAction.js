@@ -5,10 +5,10 @@ import UserModel from '../models/UserModel';
 import connectDB from '../config/database';
 import mongoose from 'mongoose';
 
-export async function getGroupItems() {
+export async function getGroupItems(ids) {
   try {
     await connectDB();
-    const data = await GroupModel.find().lean();
+    const data = await GroupModel.find({ _id: { $in: ids } }).lean();
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
     return { errMsg: error.message };

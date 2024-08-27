@@ -26,38 +26,42 @@ export async function getVotesByGroup(groupId) {
 export async function saveVoteItem(voteItem) {
   try {
     await connectDB();
-    const { foodItem, meal, userId, groupId } = voteItem;
-    if (!foodItem || !meal || !userId || !groupId) {
+    const { foodItem, meal, voter, groupId, _id } = voteItem;
+    if (!foodItem || !meal || !voter || !groupId) {
       throw new Error('Missing required fields');
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const existingVoteItem = await VoteModel.findOne({
-      foodItem,
-      meal,
-      groupId,
-      createdAt: { $gte: today, $lt: tomorrow },
-    });
+    // Find the existing vote item
+    const existingVoteItem = await VoteModel.findById(_id);
 
     if (existingVoteItem) {
-      const index = existingVoteItem.positiveVoters.indexOf(userId);
-      if (index > -1) {
-        existingVoteItem.positiveVoters.splice(index, 1);
+      const hasVoted = existingVoteItem.voters.includes(voter);
+
+      // Toggle the user's vote
+      if (hasVoted) {
+        console.log('USER HAS VOTED', existingVoteItem.voters);
+        const updateVoters = existingVoteItem.voters.filter(
+          (id) => id !== voter
+        );
+        existingVoteItem.voters = updateVoters;
+        console.log('UPDATED VOTERS', updateVoters);
       } else {
-        existingVoteItem.positiveVoters.push(userId);
+        console.log('USER HAS NOT VOTED');
+        existingVoteItem.voters.push(voter);
       }
-      await existingVoteItem.save();
-      return { success: true, data: existingVoteItem };
+      const updatedVoteItem = await existingVoteItem.save();
+
+      console.log('UPDATED VOTE ITEM', updatedVoteItem);
+      return JSON.parse(JSON.stringify(updatedVoteItem));
     } else {
-      const newVoteItem = new VoteModel(voteItem);
-      await newVoteItem.save();
-      return { success: true, data: newVoteItem };
+      // Create a new vote item
+      voteItem.voters = [voter];
+      const savedVoteItem = await new VoteModel(voteItem).save();
+      console.log('SAVED VOTE ITEM', savedVoteItem);
+      return JSON.parse(JSON.stringify(savedVoteItem));
     }
   } catch (error) {
+    console.error('Error in saveVoteItem:', error);
     return { success: false, errMsg: error.message };
   }
 }

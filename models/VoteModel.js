@@ -2,18 +2,12 @@ import { Schema, model, models } from 'mongoose';
 
 const voteSchema = new Schema(
   {
-    positiveVoters: [
+    voters: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'user',
+        type: String,
       },
     ],
-    negativeVoters: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'user',
-      },
-    ],
+
     meal: {
       type: String,
       required: true,
@@ -21,13 +15,11 @@ const voteSchema = new Schema(
     },
     foodItem: {
       required: true,
-      type: Schema.Types.ObjectId,
-      ref: 'food',
+      type: String,
     },
     groupId: {
       required: true,
-      type: Schema.Types.ObjectId,
-      ref: 'group',
+      type: String,
     },
   },
   { timestamps: true }

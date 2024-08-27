@@ -1,5 +1,11 @@
 'use client';
-import { createContext, useCallback, useMemo, useContext } from 'react';
+import {
+  createContext,
+  useCallback,
+  useMemo,
+  useContext,
+  useState,
+} from 'react';
 import { getFoodItems } from '../../_actions/postAction';
 import { getUserItems, updateUserPreferences } from '../../_actions/userAction';
 import { getGroupItems, getGroupById } from '../../_actions/groupAction';
@@ -10,10 +16,15 @@ export const AppContext = createContext(null);
 
 export default function GlobalStore({ children }) {
   const { data: session } = useSession();
+  const [userData, setUserData] = useState();
+  const [groupItems, setGroupItems] = useState();
+  const [foodItems, setFoodItems] = useState();
+  const [voteItems, setVoteItems] = useState();
 
   const fetchFoodItems = useCallback(async (id) => {
     console.log('FETCHING FOOD ITEMS');
     const data = await getFoodItems(id);
+    setFoodItems(data);
     console.log(data);
     return data;
   }, []);
@@ -21,20 +32,25 @@ export default function GlobalStore({ children }) {
   const fetchUserItems = useCallback(async (id) => {
     console.log('FETCHING USER ITEMS');
     const data = await getUserItems(id);
+    setUserData(data);
     console.log(data);
     return data;
   }, []);
 
-  const fetchGroupItems = useCallback(async () => {
+  const fetchGroupItems = useCallback(async (ids) => {
     console.log('FETCHING GROUP ITEMS');
-    const data = await getGroupItems();
-    console.log(typeof data);
+    const data = await getGroupItems(ids);
+    setGroupItems(data);
+    console.log(data);
     return data;
   }, []);
 
   const fetchVoteItems = useCallback(async () => {
     console.log('FETCHING VOTE ITEMS');
-    return await getVoteItems();
+    const data = await getVoteItems();
+    setVoteItems(data);
+    console.log(data);
+    return data;
   }, []);
 
   const fetchGroupById = useCallback(async (groupId) => {
@@ -45,6 +61,7 @@ export default function GlobalStore({ children }) {
   const fetchVotesByGroup = useCallback(async (groupId) => {
     console.log('FETCHING VOTES BY GROUP');
     const data = await getVotesByGroup(groupId);
+    setVoteItems(data);
     console.log(data);
     return data;
   }, []);
@@ -64,6 +81,10 @@ export default function GlobalStore({ children }) {
   const contextValue = useMemo(
     () => ({
       session,
+      userData,
+      groupItems,
+      foodItems,
+      voteItems,
       fetchFoodItems,
       fetchUserItems,
       fetchGroupItems,
@@ -74,6 +95,10 @@ export default function GlobalStore({ children }) {
     }),
     [
       session,
+      userData,
+      groupItems,
+      foodItems,
+      voteItems,
       fetchFoodItems,
       fetchUserItems,
       fetchGroupItems,

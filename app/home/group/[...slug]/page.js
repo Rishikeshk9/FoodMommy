@@ -9,7 +9,7 @@ import { fetchGroupMembersByGroupId } from '../../../../_actions/groupAction';
 function Home() {
   const { slug } = useParams();
   const groupId = slug[0];
-  const { fetchFoodItems, fetchVoteItems, fetchVotesByGroup } =
+  const { fetchFoodItems, fetchVoteItems, fetchVotesByGroup, voteItems } =
     useGlobalContext();
 
   const [searchQueries, setSearchQueries] = useState({
@@ -29,7 +29,6 @@ function Home() {
   });
   const [groupMembers, setGroupMembers] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
-  const [voteItems, setVoteItems] = useState([]);
 
   const fetchGroupMembers = useCallback(async () => {
     const members = await fetchGroupMembersByGroupId(groupId);
@@ -53,7 +52,13 @@ function Home() {
     }
 
     setMealItems(updatedMealItems);
-  }, [groupId, fetchFoodItems]);
+
+    const fetchData = async () => {
+      await fetchVotesByGroup(groupId);
+    };
+
+    fetchData();
+  }, [groupId]);
 
   const foodIDsToObjects = useCallback(
     async (uniqueItems) => {
@@ -66,31 +71,8 @@ function Home() {
         return [];
       }
     },
-    [fetchFoodItems]
+    [foodItems]
   );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const [foodItemsData, voteItemsData, votesByGroupData] =
-        await Promise.all([
-          fetchFoodItems(),
-          fetchVoteItems(),
-          fetchVotesByGroup(groupId),
-        ]);
-      setFoodItems(foodItemsData);
-      setVoteItems(voteItemsData);
-      // You might want to use votesByGroupData if needed
-    };
-
-    fetchData();
-    fetchGroupMembers();
-  }, [
-    groupId,
-    fetchFoodItems,
-    fetchVoteItems,
-    fetchVotesByGroup,
-    fetchGroupMembers,
-  ]);
 
   const filteredMealItems = useMemo(() => {
     const filtered = {};
@@ -100,17 +82,25 @@ function Home() {
           item.name.toLowerCase().includes(searchQueries[meal].toLowerCase())
         )
         .sort((a, b) => {
-          const votesA = voteItems?.filter(
-            (vote) => vote.foodId === a._id
-          ).length;
-          const votesB = voteItems?.filter(
-            (vote) => vote.foodId === b._id
-          ).length;
-          return votesB - votesA;
+          if (voteItems && voteItems.length > 0) {
+            const votesA = voteItems.filter(
+              (vote) => vote.foodId === a._id
+            ).length;
+            const votesB = voteItems.filter(
+              (vote) => vote.foodId === b._id
+            ).length;
+            return votesB - votesA;
+          } else {
+            return a.name.localeCompare(b.name);
+          }
         });
     }
     return filtered;
-  }, [mealItems, searchQueries, voteItems]);
+  }, [voteItems, searchQueries, mealItems]);
+
+  useEffect(() => {
+    fetchGroupMembers();
+  }, [groupId]);
 
   const handleSearchChange = useCallback((meal, value) => {
     setSearchQueries((prev) => ({ ...prev, [meal]: value }));
@@ -131,7 +121,9 @@ function Home() {
             >
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <p className='px-2 uppercase'>{meal}</p>
+                  <p className='px-2 font-bold uppercase text-black/70'>
+                    {meal}
+                  </p>
                   <p className='px-2 text-sm text-gray-500'>
                     {filteredMealItems[meal].length} items
                   </p>
@@ -163,7 +155,7 @@ function Home() {
                   )}
                 </div>
               </div>
-              <div className='flex w-full gap-2 overflow-scroll scrollbar-none'>
+              <div className='flex w-full h-48 gap-2 overflow-scroll scrollbar-none'>
                 {filteredMealItems[meal].length > 0 ? (
                   filteredMealItems[meal].map((item, index) => (
                     <FoodCard

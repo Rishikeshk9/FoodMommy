@@ -35,13 +35,18 @@ export default function Account() {
   }, [session]);
 
   const handleMealComplete = (items) => {
-    setSelectedMeals({ ...selectedMeals, [currentMeal]: items });
     if (currentMeal === 'breakfast') {
+      setSelectedMeals((prevMeals) => ({ ...prevMeals, [currentMeal]: items }));
       setCurrentMeal('lunch');
     } else if (currentMeal === 'lunch') {
+      setSelectedMeals((prevMeals) => ({ ...prevMeals, [currentMeal]: items }));
       setCurrentMeal('dinner');
     } else {
-      _saveUserPreferences(selectedMeals);
+      setSelectedMeals((prevMeals) => {
+        const updatedMeals = { ...prevMeals, [currentMeal]: items };
+        _saveUserPreferences(updatedMeals);
+        return updatedMeals;
+      });
       router.push('/home/account');
     }
   };
@@ -134,7 +139,7 @@ const OnboardingMeal = ({ mealType, onComplete, preSelectedItems }) => {
               className={`cursor-pointer w-full py-2 mt-auto font-bold  transition-all duration-100   rounded-lg active:text-white  active:bg-lime-400 active:border-0   ${
                 selectedItems.includes(item._id)
                   ? 'bg-lime-500   border-b-4 text-white  border-b-lime-600'
-                  : 'border-b-black/20 bg-slate-50 border-b-4 text-slate-500'
+                  : 'border-b-black/20 bg-slate-50  text-slate-500'
               }`}
             >
               <div className='relative flex items-center justify-center gap-1 text-center'>

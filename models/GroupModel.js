@@ -24,6 +24,11 @@ const groupSchema = new Schema(
         ref: 'user',
       },
     ],
+    visibility: {
+      type: String,
+      enum: ['public', 'private'],
+      default: 'public',
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'user',
