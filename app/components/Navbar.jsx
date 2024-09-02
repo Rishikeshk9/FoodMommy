@@ -11,9 +11,9 @@ import {
 import { useGlobalContext } from '../contexts/globalContext';
 
 import { useSession } from 'next-auth/react';
-import GroupsListItemUser from '../components/GroupsListItemUser';
+import GroupsListItemUser from './GroupsListItemUser';
 import dynamic from 'next/dynamic';
-import Modal from '../components/Modal';
+import Modal from './Modal';
 import { createGroup, joinGroup } from '../../_actions/groupAction';
 import { saveUserItem, updateUserItem } from '../../_actions/userAction';
 

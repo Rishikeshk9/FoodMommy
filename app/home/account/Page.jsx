@@ -12,7 +12,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import CircularList from '../../components/CircularList';
 
-const UserProfile = () => {
+const Page = () => {
   const [user, setUser] = useState(null);
   const [preferences, setPreferences] = useState({
     breakfast: [],
@@ -180,4 +180,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default Page;

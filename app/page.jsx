@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Navbar from './components/Navbar';
 import { useSession } from 'next-auth/react';
 
-export default function main() {
+export default function Page() {
   const { data: session } = useSession();
 
   useEffect(() => {

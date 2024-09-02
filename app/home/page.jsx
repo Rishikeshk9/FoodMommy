@@ -13,7 +13,7 @@ import {
   IconSquareCheckFilled,
 } from '@tabler/icons-react';
 
-const HomeComponent = () => {
+const Page = () => {
   const { fetchGroupItems, fetchUserItems, groupItems, userData } =
     useGlobalContext();
   const { data: session } = useSession();
@@ -194,4 +194,4 @@ const HomeComponent = () => {
   ) : null;
 };
 
-export default HomeComponent;
+export default Page;

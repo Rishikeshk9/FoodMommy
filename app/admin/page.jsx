@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 
-function page() {
+function Page() {
   return (
     <div className='flex gap-2'>
-      <Link className='bg-blue-500 p-2 ' href='/admin/users'>
+      <Link className='p-2 bg-blue-500 ' href='/admin/users'>
         Go to Users
       </Link>
       <Link href='/admin/food' className='bg-orange-500'>
@@ -17,4 +17,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

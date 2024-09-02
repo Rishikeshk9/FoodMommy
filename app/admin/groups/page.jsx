@@ -5,7 +5,7 @@ import { createGroup } from '../../../_actions/groupAction';
 import GroupListItem from '../../components/GroupListItem';
 import { IconPlus, IconRefresh, IconX } from '@tabler/icons-react';
 
-export default function Admin() {
+export default function Page() {
   const { groupItems, fetchGroupItems, fetchUserItems, userItems } =
     useGlobalContext();
   const [showModal, setShowModal] = useState(false);
@@ -17,28 +17,25 @@ export default function Admin() {
   }, []);
 
   return (
-    <div
-      className='flex flex-col  h-full   text-black/80
-    '
-    >
+    <div className='flex flex-col h-full text-black/80 '>
       <FormModal showModal={showModal} setShowModal={setShowModal} />
-      <div className='flex justify-between p-2 items-center align-middle'>
-        <p className='font-bold uppercase px-2 flex gap-2'>
+      <div className='flex items-center justify-between p-2 align-middle'>
+        <p className='flex gap-2 px-2 font-bold uppercase'>
           All Groups{' '}
           <IconRefresh
-            className='active:rotate-180 active:text-green-700  cursor-pointer   transition-all duration-250  '
+            className='transition-all cursor-pointer active:rotate-180 active:text-green-700 duration-250 '
             onClick={() => fetchGroupItems()}
           />
         </p>
 
         <div
           onClick={() => setShowModal(!showModal)}
-          className='bg-blue-500 border border-blue-700 active:bg-blue-700 flex rounded  p-1 px-2 cursor-pointer text-white'
+          className='flex p-1 px-2 text-white bg-blue-500 border border-blue-700 rounded cursor-pointer active:bg-blue-700'
         >
           Add New
         </div>
       </div>
-      <div className='flex flex-col    '>
+      <div className='flex flex-col '>
         {groupItems &&
           groupItems.length > 0 &&
           groupItems
@@ -99,10 +96,10 @@ export default function Admin() {
 
     return (
       showModal && (
-        <div className='absolute top-0  md:p-4  w-full h-screen items-center flex   align-middle justify-center  text-center mx-auto bg-black/10 backdrop-blur-md'>
-          <div className='bg-white mt-auto md:rounded-lg flex flex-col border border-neutral-200 p-4 text-black/80 gap-2 w-full mx-auto md:max-w-md'>
+        <div className='absolute top-0 flex items-center justify-center w-full h-screen mx-auto text-center align-middle md:p-4 bg-black/10 backdrop-blur-md'>
+          <div className='flex flex-col w-full gap-2 p-4 mx-auto mt-auto bg-white border md:rounded-lg border-neutral-200 text-black/80 md:max-w-md'>
             <input
-              className='border rounded p-2'
+              className='p-2 border rounded'
               type='text'
               value={name}
               onChange={handleNameChange}
@@ -121,14 +118,14 @@ export default function Admin() {
                 ))}
             </select>
             <input
-              className='border rounded p-2'
+              className='p-2 border rounded'
               type='text'
               value={createdBy}
               onChange={handleCreatedByChange}
               placeholder='Creator userName'
             />
             <input
-              className='border rounded p-2'
+              className='p-2 border rounded'
               type='text'
               value={description}
               onChange={handleDescriptionChange}

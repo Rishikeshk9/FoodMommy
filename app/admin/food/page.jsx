@@ -6,7 +6,7 @@ import FoodCard from '../../components/FoodCard';
 import FoodListItem from '../../components/FoodListItem';
 import { IconPlus, IconRefresh, IconX } from '@tabler/icons-react';
 
-export default function Admin() {
+export default function Page() {
   const { fetchFoodItems } = useGlobalContext();
   const [foodItems, setFoodItems] = useState([]);
   const [showModal, setShowModal] = useState(false);

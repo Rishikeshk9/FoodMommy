@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { useGlobalContext } from '../contexts/globalContext';
 
-function Login() {
+function Page() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { fetchUserItems } = useGlobalContext();
@@ -71,4 +71,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Page;
