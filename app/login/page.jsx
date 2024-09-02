@@ -16,7 +16,7 @@ function Login() {
   }, [status, session, router, fetchUserItems]);
   const checkUserMeals = async () => {
     if (status === 'authenticated' && session?.user?.id) {
-      const user = await fetchUserItems(session.user.id);
+      const user = await fetchUserItems(session?.user?.id);
       if (user && (!user.breakfast || user.breakfast.length === 0)) {
         router.push('/home/account/preferences');
       } else {
@@ -48,13 +48,13 @@ function Login() {
             {!session ? (
               <div
                 onClick={handleSignIn}
-                className='flex gap-2  p-4 border active:bg-black/10 cursor-pointer active:scale-[0.99]  uppercase text-xs align-middle items-center'
+                className='flex gap-2 text-black p-4 border active:bg-black/10 cursor-pointer active:scale-[0.99]  uppercase text-xs align-middle items-center'
               >
                 <IconBrandGoogle />
                 Sign In with Google
               </div>
             ) : (
-              <div className='flex flex-col gap-4 text-center'>
+              <div className='flex flex-col gap-4 text-center text-black'>
                 <p>Welcome, {session.user.name}</p>
                 <button
                   onClick={() => signOut()}

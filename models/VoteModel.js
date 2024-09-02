@@ -21,6 +21,11 @@ const voteSchema = new Schema(
       required: true,
       type: String,
     },
+    votingForDate: {
+      type: Date,
+      required: true,
+      default: new Date(),
+    },
   },
   { timestamps: true }
 );

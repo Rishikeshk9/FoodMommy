@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import GroupsListItemUser from '../components/GroupsListItemUser';
 import dynamic from 'next/dynamic';
 import Modal from '../components/Modal';
-import { createGroup } from '../../_actions/groupAction';
+import { createGroup, joinGroup } from '../../_actions/groupAction';
 import { saveUserItem, updateUserItem } from '../../_actions/userAction';
 import {
   IconCheckbox,
@@ -22,29 +22,15 @@ const HomeComponent = () => {
 
   const [anyoneCanJoin, setAnyoneCanJoin] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (session?.user?.id) {
-        try {
-          const user = await fetchUserItems(session?.user?.id);
-          await fetchGroupItems(user?.groups);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        } finally {
-          setIsLoading(false); // Set loading to false once data is fetched
-        }
-      }
-    };
-    fetchData();
-  }, [session]);
-
   const handleCreateGroup = async () => {
+    const groupCode = generateUniqueCode(6);
     const groupData = {
       name: groupName,
       description: 'description',
       createdBy: session?.user?.id,
       members: [session?.user?.id],
       admins: [session?.user?.id],
+      groupCode: groupCode,
     };
     console.log('CREATING GROUP', groupData);
     const result = await createGroup(groupData);
@@ -74,6 +60,35 @@ const HomeComponent = () => {
       console.error('Error creating group:', result.errMsg);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (session?.user?.id) {
+        try {
+          const user = await fetchUserItems(session?.user?.id);
+          await fetchGroupItems(user?.groups);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setIsLoading(false); // Set loading to false once data is fetched
+        }
+      }
+    };
+    fetchData();
+  }, [session]);
+
+  const generateUniqueCode = (length) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return result;
+  };
+
+  // Generate a 6-character code
 
   if (isLoading) {
     return (
@@ -105,10 +120,15 @@ const HomeComponent = () => {
           </div>
           <div className='flex h-12'>
             <div
-              onClick={() => {
+              onClick={async () => {
                 const groupId = prompt('Enter the group ID:');
                 if (groupId) {
                   console.log('Joining group with ID:', groupId);
+                  joinGroup(groupId, session?.user?.id).then(() => {
+                    fetchUserItems(session?.user?.id).then((userData) => {
+                      fetchGroupItems(userData?.groups);
+                    });
+                  });
                 }
               }}
               className='px-4 py-2 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border-b-4 rounded-lg cursor-pointer text-slate-400 bg-slate-200 border-b-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white active:border-0'

@@ -8,8 +8,9 @@ import {
 } from '../../../_actions/userAction';
 import { getFoodItems } from '../../../_actions/postAction';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import CircularList from '../../components/CircularList';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -20,7 +21,7 @@ const UserProfile = () => {
   });
   const [foodItems, setFoodItems] = useState({});
   const { data: session } = useSession();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isGroupsExpanded, setIsGroupsExpanded] = useState(false);
   const [isAccountSettingsExpanded, setIsAccountSettingsExpanded] =
     useState(false);
@@ -66,28 +67,10 @@ const UserProfile = () => {
     setFoodItems(foodMap);
   };
 
-  const handlePreferenceChange = (meal, value) => {
-    setPreferences((prev) => ({
-      ...prev,
-      [meal]: value.split(',').map((item) => item.trim()),
-    }));
-  };
-
-  const handleSavePreferences = async () => {
-    if (user) {
-      const result = await saveUserPreferences(user._id, preferences);
-      if (result.success) {
-        alert('Preferences saved successfully!');
-      } else {
-        alert('Error saving preferences');
-      }
-    }
-  };
-
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className='flex flex-col max-w-2xl gap-4 p-4 mx-auto text-black bg-white'>
+    <div className='flex flex-col h-screen max-w-2xl gap-4 p-4 mx-auto text-black bg-white'>
       <div className='flex gap-2 p-2 bg-white border-2 rounded-lg shadow border-gray-50'>
         <div className='flex items-center justify-center align-middle'>
           <img
@@ -95,7 +78,7 @@ const UserProfile = () => {
             alt={user.name}
             width={100}
             height={100}
-            className='w-12 h-12 rounded-full'
+            className='w-12 h-12 bg-gray-100 rounded-full '
           />
         </div>
         <div className='flex flex-col justify-center align-middle'>
@@ -154,7 +137,7 @@ const UserProfile = () => {
           </div>
         )}
       </div>
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col hidden gap-2'>
         <div
           className='flex items-center justify-between mb-2 align-middle cursor-pointer'
           onClick={() => setIsGroupsExpanded(!isGroupsExpanded)}
@@ -188,8 +171,8 @@ const UserProfile = () => {
       </div>
 
       <button
-        className='mx-auto font-semibold cursor-pointer text-slate-300 active:scale-95 active:text-red-500 w-fit'
-        onClick={() => signOut()}
+        className='mx-auto mt-auto mb-24 font-semibold cursor-pointer text-slate-300 active:scale-95 active:text-red-500 w-fit'
+        onClick={() => signOut().then(() => router.push('/login'))}
       >
         Logout
       </button>

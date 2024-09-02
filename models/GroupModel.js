@@ -29,6 +29,11 @@ const groupSchema = new Schema(
       enum: ['public', 'private'],
       default: 'public',
     },
+    groupCode: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'user',

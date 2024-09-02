@@ -36,17 +36,17 @@ function GroupsListItemUser({ group }) {
     <>
       <Link
         href={`home/group/${group?._id}`}
-        className={`    w-full gap-2  cursor-pointer  border        transition-all duration-400   text-center align-middle items-center flex px-4 py-2 hover:bg-black/5`}
+        className={`w-full gap-2  cursor-pointer  border        transition-all duration-400   text-center align-middle items-center flex px-4 py-2 hover:bg-black/5`}
       >
         <div
-          className={` flex items-center align-middle h-12 w-12 bg-gray-200 rounded-full  gap-2      overflow-clip `}
+          className={`flex items-center align-middle h-12 w-12 bg-gray-200 rounded-full  gap-2      overflow-clip `}
         >
           <img className='w-full h-12 rounded-full ' src={image} />
         </div>
-        <div className='flex gap-1 text-left'>
+        <div className='flex flex-col text-left'>
           <p className='font-bold text-black/70'>{group?.name}</p>
-          <p className='flex items-center gap-1 text-xs font-semibold text-gray-400 align-middle'>
-            <IconUsers className='w-4 h-4 text-xs ' /> {group?.members?.length}
+          <p className='flex items-center text-xs text-gray-400 align-middle'>
+            #{group?.groupCode}
           </p>
         </div>
       </Link>

@@ -28,10 +28,57 @@ export async function getGroupById(groupId) {
   }
 }
 
+export async function joinGroup(groupId, userId) {
+  try {
+    await connectDB();
+    console.log('JOINING GROUP', groupId, userId);
+
+    // Remove '#' from groupId if present
+    groupId = groupId.replace('#', '');
+
+    const group = await GroupModel.findOne({ groupCode: groupId });
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (!group) {
+      throw new Error('Group not found');
+    }
+
+    if (group.visiblity === 'private') {
+      return { success: false, errMsg: 'Group is private' };
+    }
+
+    if (group.members.includes(user._id)) {
+      return { success: false, errMsg: 'You are already in this group' };
+    }
+
+    if (group.admins.includes(user._id)) {
+      return { success: false, errMsg: 'You are already an admin' };
+    }
+
+    group.members.push(user._id);
+    await group.save();
+
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { $push: { groups: group._id } },
+      { new: true }
+    );
+
+    return { success: true, msg: 'Joined group successfully' };
+  } catch (error) {
+    return { success: false, errMsg: error.message };
+  }
+}
+
 export async function createGroup(groupData) {
   try {
     await connectDB();
     const newGroup = new GroupModel(groupData);
+
     await newGroup.save();
     return JSON.parse(JSON.stringify(newGroup));
   } catch (error) {

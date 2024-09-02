@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Navbar from './components/Navbar';
 import { useSession } from 'next-auth/react';
@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 export default function main() {
   const { data: session } = useSession();
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Check if session exists
     if (session) {
       // Session exists, redirect to home route

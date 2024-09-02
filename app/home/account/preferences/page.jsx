@@ -14,7 +14,7 @@ export default function Account() {
   });
   const { data: session } = useSession();
   const router = useRouter();
-  const { fetchUserItems, saveUserPreferences, fetchFoodItems } =
+  const { fetchUserItems, saveUserPreferences, fetchFoodItems, userData } =
     useGlobalContext();
 
   const fetchUser = async () => {
@@ -45,17 +45,24 @@ export default function Account() {
       setSelectedMeals((prevMeals) => {
         const updatedMeals = { ...prevMeals, [currentMeal]: items };
         _saveUserPreferences(updatedMeals);
+
         return updatedMeals;
       });
-      router.push('/home/account');
     }
   };
 
   const _saveUserPreferences = async (selectedMeals) => {
     try {
       console.log('SAVING USER PREFERENCES', selectedMeals);
-      const result = await saveUserPreferences(session.user.id, selectedMeals);
-      console.log('User preferences saved', result);
+      saveUserPreferences(session.user.id, selectedMeals).then(() => {
+        if (!userData.groups || userData.groups.length <= 0) {
+          console.log('userData.groups', userData.groups);
+          router.push('/home');
+        } else {
+          console.log('userData.groupsasdasd', userData.groups);
+          router.push('/home/account');
+        }
+      });
     } catch (error) {
       console.error('Error saving user preferences:', error);
     }
@@ -109,7 +116,7 @@ const OnboardingMeal = ({ mealType, onComplete, preSelectedItems }) => {
   };
 
   return (
-    <div className='relative text-black'>
+    <div className='relative text-black '>
       <div className='sticky top-0 left-0 z-10 px-4 py-1 bg-lime-100'>
         <h2 className='mb-4 text-2xl font-semibold'>
           Choose your favorite{' '}
@@ -155,7 +162,7 @@ const OnboardingMeal = ({ mealType, onComplete, preSelectedItems }) => {
 
       {selectedItems.length >= 5 && (
         <button
-          className='sticky bottom-0 left-0 w-full p-2 mt-4 font-bold text-white bg-lime-500 active:bg-lime-600'
+          className='sticky bottom-0 left-0 w-full p-2 mt-4 font-bold text-white bg-lime-500 active:bg-lime-600 z-[99] '
           onClick={() => {
             onComplete(selectedItems);
             setSelectedItems([]);

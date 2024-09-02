@@ -12,10 +12,23 @@ export async function getVoteItems() {
   }
 }
 
-export async function getVotesByGroup(groupId) {
+export async function getVotesByGroup(groupId, date) {
   try {
     await connectDB();
-    const votes = await VoteModel.find({ groupId }).lean();
+    let dateObj;
+    if (date) {
+      dateObj = new Date(date);
+    } else {
+      dateObj = new Date();
+    }
+    dateObj.setHours(0, 0, 0, 0); // Set time to start of day
+
+    const nextDay = new Date(dateObj);
+    nextDay.setDate(dateObj.getDate() + 1);
+    const votes = await VoteModel.find({
+      groupId,
+      votingForDate: { $gte: dateObj, $lt: nextDay },
+    }).lean();
     if (!votes.length) throw new Error('Votes not found');
     return JSON.parse(JSON.stringify(votes));
   } catch (error) {
@@ -23,11 +36,11 @@ export async function getVotesByGroup(groupId) {
   }
 }
 
-export async function saveVoteItem(voteItem) {
+export async function saveVoteItem(voteItem, votingForDate) {
   try {
     await connectDB();
     const { foodItem, meal, voter, groupId, _id } = voteItem;
-    if (!foodItem || !meal || !voter || !groupId) {
+    if (!foodItem || !meal || !voter || !groupId || !votingForDate) {
       throw new Error('Missing required fields');
     }
 
@@ -43,8 +56,15 @@ export async function saveVoteItem(voteItem) {
         const updateVoters = existingVoteItem.voters.filter(
           (id) => id !== voter
         );
-        existingVoteItem.voters = updateVoters;
-        console.log('UPDATED VOTERS', updateVoters);
+        if (updateVoters.length === 0) {
+          // If no voters left, delete the vote object
+          await VoteModel.findByIdAndDelete(existingVoteItem._id);
+          console.log('VOTE ITEM DELETED');
+          return { deleted: true };
+        } else {
+          existingVoteItem.voters = updateVoters;
+          console.log('UPDATED VOTERS', updateVoters);
+        }
       } else {
         console.log('USER HAS NOT VOTED');
         existingVoteItem.voters.push(voter);
@@ -56,6 +76,7 @@ export async function saveVoteItem(voteItem) {
     } else {
       // Create a new vote item
       voteItem.voters = [voter];
+      voteItem.votingForDate = votingForDate;
       const savedVoteItem = await new VoteModel(voteItem).save();
       console.log('SAVED VOTE ITEM', savedVoteItem);
       return JSON.parse(JSON.stringify(savedVoteItem));

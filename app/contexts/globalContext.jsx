@@ -58,9 +58,9 @@ export default function GlobalStore({ children }) {
     return await getGroupById(groupId);
   }, []);
 
-  const fetchVotesByGroup = useCallback(async (groupId) => {
+  const fetchVotesByGroup = useCallback(async (groupId, date) => {
     console.log('FETCHING VOTES BY GROUP');
-    const data = await getVotesByGroup(groupId);
+    const data = await getVotesByGroup(groupId, date);
     setVoteItems(data);
     console.log(data);
     return data;

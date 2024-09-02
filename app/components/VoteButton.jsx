@@ -12,8 +12,8 @@ import { useGlobalContext } from '../contexts/globalContext';
 import CountUp from 'react-countup';
 import AnimatedNumbers from 'react-animated-numbers';
 
-function VoteButton({ itemId, meal, groupId, voteItem }) {
-  const { fetchVoteItems } = useGlobalContext();
+function VoteButton({ itemId, meal, groupId, voteItem, podium, date }) {
+  const { fetchVotesByGroup } = useGlobalContext();
 
   const { data: session } = useSession();
 
@@ -29,12 +29,12 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
     };
 
     console.log('POSTING VOTE', voteData);
-    saveVoteItem(voteData).then(async (result) => {
+    saveVoteItem(voteData, date).then(async (result) => {
       console.log(result);
       if (result) {
         console.log('Vote created successfully:', result);
         // Handle success (e.g., navigate to group page, notify user)
-        await fetchVoteItems();
+        await fetchVotesByGroup(groupId, date);
       } else {
         console.error('Error creating group:', result);
         // Handle error (e.g., show error message to user)
@@ -47,9 +47,11 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
       <div className='flex items-center justify-center w-10 h-10 text-center text-white uppercase align-middle rounded-full active:bg-red-500/10 aspect-square'>
         <IconHeart
           onClick={() => {
-            handleVote(true);
+            !podium && handleVote(true);
           }}
-          className={`cursor-pointer  active:fill-red-500 active:scale-95 ${
+          className={`${
+            !podium && 'cursor-pointer'
+          }  active:fill-red-500 active:scale-95 ${
             voteItem?.voters?.includes(session?.user?.id)
               ? 'fill-red-500 text-red-600'
               : 'text-gray-600'
@@ -57,7 +59,9 @@ function VoteButton({ itemId, meal, groupId, voteItem }) {
         />
       </div>
       <div
-        className={`cursor-pointer  active:fill-red-500 active:scale-95 ${
+        className={`${
+          !podium && 'cursor-pointer'
+        }   active:fill-red-500 active:scale-95 ${
           voteItem?.voters?.includes(session?.user?.id)
             ? 'fill-red-500 text-red-600'
             : 'text-gray-600'

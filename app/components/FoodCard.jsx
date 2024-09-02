@@ -2,29 +2,45 @@ import React, { useEffect, useState } from 'react';
 import VoteButton from './VoteButton';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 
-function FoodCard({ groupId, meal, index, adminPanel, foodItem, voteItem }) {
-  const [image, setImage] = useState(foodItem.image);
-
+function FoodCard({
+  date,
+  groupId,
+  meal,
+  index,
+  adminPanel,
+  foodItem,
+  voteItem,
+  podium,
+}) {
   useEffect(() => {
     if (voteItem !== undefined) {
     }
   }, []);
   return (
     <div
-      className={`aspect-square  border border-gray-50  min-w-44 h-fit  shadow    flex-col    transition-all duration-400 rounded   text-center align-middle items-center flex justify-center bg-white`}
+      className={` gap-2    h-fit ${
+        !podium ? 'min-h-44' : ''
+      }    w-fit max-h-44   flex-col    transition-all duration-400 rounded   text-center align-middle items-center flex justify-center  `}
     >
-      <p className='font-semibold '>
-        {foodItem.name} {index}
-      </p>
-      <div
-        className={` flex w-full bg-gray-100 items-center align-middle justify-center flex-col  h-24 overflow-clip `}
+      <p
+        className={`${
+          podium && 'text-black/50'
+        } truncate w-20   text-xs font-semibold`}
       >
-        <img className='object-cover w-full h-full ' src={image} />
-      </div>
+        {foodItem.name}
+      </p>
 
+      <img
+        className={`${
+          podium ? 'w-24 h-24' : 'w-20 h-20'
+        } rounded-full aspect-square object-cover bg-white p-1 drop-shadow-md`}
+        src={foodItem.image}
+      />
       {!adminPanel ? (
         <VoteButton
+          podium={podium}
           meal={meal}
+          date={date}
           groupId={groupId}
           itemId={foodItem._id}
           voteItem={voteItem}
