@@ -10,7 +10,10 @@ import React, { useEffect } from 'react';
 import { saveVoteItem } from '../../_actions/voteAction';
 import { useGlobalContext } from '../contexts/globalContext';
 import CountUp from 'react-countup';
-import AnimatedNumbers from 'react-animated-numbers';
+import dynamic from 'next/dynamic';
+const AnimatedNumbers = dynamic(() => import('react-animated-numbers'), {
+  ssr: false,
+});
 
 function VoteButton({ itemId, meal, groupId, voteItem, podium, date }) {
   const { fetchVotesByGroup } = useGlobalContext();
