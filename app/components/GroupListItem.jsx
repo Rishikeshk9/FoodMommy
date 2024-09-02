@@ -1,4 +1,4 @@
-'use strict';
+'use client';
 import React, { useEffect, useState } from 'react';
 import VoteButton from './VoteButton';
 import axios, { isCancel, AxiosError } from 'axios';

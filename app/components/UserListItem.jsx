@@ -1,4 +1,4 @@
-'use strict';
+'use client';
 import React, { useEffect, useState } from 'react';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import { deleteUserItem, updateUserItem } from '../../_actions/userAction';
