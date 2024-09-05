@@ -86,9 +86,10 @@ function Page() {
             ) : (
               <div className='flex flex-col gap-4 text-center text-black'>
                 <p>Welcome, {session.user.name}</p>
+                Redirecting...
                 <button
                   onClick={() => signOut()}
-                  className='px-4 py-2 text-white bg-red-500 rounded'
+                  className='text-white rounded  active:text-red-500'
                 >
                   Sign Out
                 </button>
@@ -96,7 +97,7 @@ function Page() {
             )}
           </div>
         </div>
-        <p className='mt-12 text-sm text-gray-500'>
+        <p className='absolute bottom-0 p-4 mt-12 text-sm text-center text-gray-500'>
           By signing in, you agree to our{' '}
           <a href='/terms' className='text-blue-500'>
             Terms of Service
