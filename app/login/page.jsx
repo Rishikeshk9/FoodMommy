@@ -89,7 +89,7 @@ function Page() {
                 Redirecting...
                 <button
                   onClick={() => signOut()}
-                  className='text-white rounded  active:text-red-500'
+                  className='hidden text-white rounded active:text-red-500'
                 >
                   Sign Out
                 </button>
