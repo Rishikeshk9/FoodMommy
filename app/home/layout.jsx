@@ -5,6 +5,7 @@ import { useGlobalContext } from '../contexts/globalContext';
 import { useSession } from 'next-auth/react';
 import GroupsListItemUser from '../components/GroupsListItemUser';
 import Navbar from '../components/Navbar';
+import BottomNav from '../components/BottomNav';
 
 const Home = ({ children }) => {
   const { fetchGroupItems } = useGlobalContext();
@@ -22,9 +23,12 @@ const Home = ({ children }) => {
   }, [session, fetchGroupItems]);
 
   return (
-    <div className='w-full bg-white'>
+    <div className='flex flex-col min-h-screen'>
       <Navbar />
+
+      {/* Add padding to bottom to account for BottomNav */}
       {children}
+      <BottomNav />
     </div>
   );
 };

@@ -38,7 +38,8 @@ export async function joinGroup(groupId, userId) {
 
     const group = await GroupModel.findOne({ groupCode: groupId });
     const user = await UserModel.findById(userId);
-
+    console.log('USER', user);
+    console.log('GROUP', group);
     if (!user) {
       throw new Error('User not found');
     }

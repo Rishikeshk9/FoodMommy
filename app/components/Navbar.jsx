@@ -25,6 +25,7 @@ function Navbar() {
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
   const [anyoneCanJoin, setAnyoneCanJoin] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const generateUniqueCode = (length) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -35,6 +36,12 @@ function Navbar() {
       );
     }
     return result;
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setGroupName('');
+    setAnyoneCanJoin(true);
   };
 
   const handleCreateGroup = async () => {
@@ -77,22 +84,35 @@ function Navbar() {
   };
 
   return (
-    <>
-      <div className='sticky top-0 w-full px-4 align-middle  items-center pb-2 bg-white border-b border-b-[#1e293b4e] text-black z-50 justify-between flex'>
-        <Link className='text-xl font-bold' href='/home'>
-          KayKhau
+    <nav className='relative'>
+      <div className='flex justify-between p-3'>
+        <Link href='/' className='flex items-center'>
+          {/* Replace the brand text with the logo image */}
+          <img src='/logo.svg' alt='KayKhau Logo' className='w-auto h-5' />
         </Link>
         <div className='flex items-center justify-between text-sm font-semibold rounded-lg'>
           <Modal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
             trigger={
-              <div className='flex h-12 '>
-                <div className='px-4 py-2 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border-b-4 rounded-lg cursor-pointer text-slate-400 bg-slate-200 border-b-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white active:border-0'>
-                  Create Group
-                </div>
+              <div
+                onClick={() => setIsModalOpen(true)}
+                className='px-2 py-1 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border rounded-lg cursor-pointer text-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white'
+              >
+                Create Group
               </div>
             }
             content={
-              <div className='flex flex-col gap-2 text-black '>
+              <div className='flex flex-col w-full gap-2 text-black '>
+                <div className='flex items-center justify-between'>
+                  <h2 className='text-lg font-bold'>Create Group</h2>
+                  <button
+                    onClick={handleCloseModal}
+                    className='text-black/50 hover:text-black'
+                  >
+                    ✕
+                  </button>
+                </div>
                 <input
                   type='text'
                   onChange={(e) => setGroupName(e.target.value.trimStart())}
@@ -121,7 +141,10 @@ function Navbar() {
                     </div>
                   </div>
                   <div
-                    onClick={handleCreateGroup}
+                    onClick={() => {
+                      handleCreateGroup();
+                      handleCloseModal();
+                    }}
                     className={`px-4 py-2 w-full text-center mt-auto font-bold uppercase transition-all duration-100 ease-in-out rounded-lg cursor-pointer ${
                       groupName.length > 0
                         ? 'bg-lime-300 border-b-4  text-lime-500 border-b-lime-400  active:text-white active:border-0 '
@@ -137,18 +160,16 @@ function Navbar() {
         </div>
       </div>
 
-      {session && (
-        <div className='fixed bottom-0 left-0 right-0 flex justify-around w-full p-2 bg-white border-t border-t-[#1e293b4e] '>
-          <Link href='/home' className='text-gray-500 hover:text-black'>
-            <IconHome />
-          </Link>
-
-          <Link href='/home/account' className='text-gray-500 hover:text-black'>
-            <IconUser />
-          </Link>
-        </div>
-      )}
-    </>
+      {/* New bottom navigation */}
+      <div className='fixed bottom-0 left-0 right-0 flex justify-around p-3 bg-white border-t border-gray-200'>
+        <Link href='/home' className='flex flex-col items-center'>
+          <IconHome className='w-6 h-6' />
+        </Link>
+        <Link href='/home/account' className='flex flex-col items-center'>
+          <IconUser className='w-6 h-6' />
+        </Link>
+      </div>
+    </nav>
   );
 }
 

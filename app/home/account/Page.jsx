@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import CircularList from '../../components/CircularList';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const [user, setUser] = useState(null);
@@ -25,6 +26,7 @@ const Page = () => {
   const [isGroupsExpanded, setIsGroupsExpanded] = useState(false);
   const [isAccountSettingsExpanded, setIsAccountSettingsExpanded] =
     useState(false);
+  const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       const result = await getUserItems(session?.user?.id);
@@ -70,8 +72,8 @@ const Page = () => {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className='flex flex-col h-screen max-w-2xl gap-4 p-4 mx-auto text-black bg-white'>
-      <div className='flex gap-2 p-2 bg-white border-2 rounded-lg shadow border-gray-50'>
+    <div className='flex flex-col w-full h-screen gap-4 p-4 mx-auto text-black bg-white'>
+      <div className='flex max-w-md gap-2 p-2 bg-white border-2 rounded-lg shadow border-gray-50'>
         <div className='flex items-center justify-center align-middle'>
           <img
             src={user.image || '/default-avatar.png'}
@@ -92,7 +94,7 @@ const Page = () => {
       </div>
       <div className=''>
         <div
-          className='flex items-center justify-between mb-2 align-middle cursor-pointer'
+          className='flex items-center mb-2 align-middle cursor-pointer'
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <h2 className='font-semibold text'>Meal Preferences</h2>{' '}
@@ -130,7 +132,7 @@ const Page = () => {
               ))}
             </div>
             <Link href='/home/account/preferences' className='flex h-12'>
-              <button className='w-full py-2 mt-auto font-bold text-blue-200 transition-all duration-100 bg-blue-500 border-b-4 rounded-lg active:text-white active:bg-blue-500 active:border-0 border-b-blue-600'>
+              <button className='w-full max-w-md py-2 mt-auto font-bold text-blue-200 transition-all duration-100 bg-blue-500 border-b-4 rounded-lg active:text-white active:bg-blue-500 active:border-0 border-b-blue-600'>
                 Edit Preferences
               </button>
             </Link>{' '}
@@ -172,7 +174,7 @@ const Page = () => {
 
       <button
         className='mx-auto mt-auto mb-24 font-semibold cursor-pointer text-slate-300 active:scale-95 active:text-red-500 w-fit'
-        onClick={() => signOut().then(() => router.push('/login'))}
+        onClick={() => signOut({ callbackUrl: '/login' })}
       >
         Logout
       </button>

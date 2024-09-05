@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 
-const Modal = ({ content, trigger }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Modal({ isOpen, onClose, trigger, content }) {
+  if (!isOpen) {
+    return trigger;
+  }
 
   return (
-    <>
-      <div onClick={() => setIsOpen(true)}> {trigger}</div>
-      {isOpen && (
-        <div className='fixed inset-0 z-50 flex items-end justify-center h-screen md:items-center bg-black/50'>
-          <div className='z-10 w-full max-w-md p-5 bg-white rounded-lg'>
-            {content}
-          </div>
-        </div>
-      )}
-    </>
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
+      <div className='bg-white p-4 rounded-lg'>{content}</div>
+    </div>
   );
-};
-
-export default Modal;
+}

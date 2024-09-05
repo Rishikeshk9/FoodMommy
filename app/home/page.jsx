@@ -21,6 +21,7 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
   const [anyoneCanJoin, setAnyoneCanJoin] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreateGroup = async () => {
     const groupCode = generateUniqueCode(6);
@@ -59,6 +60,12 @@ const Page = () => {
     } else {
       console.error('Error creating group:', result.errMsg);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setGroupName('');
+    setAnyoneCanJoin(true);
   };
 
   useEffect(() => {
@@ -138,18 +145,29 @@ const Page = () => {
           </div>
           <p className='font-bold uppercase text-slate-300'>or</p>
           <Modal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
             trigger={
-              <div className='flex h-12'>
+              <div className='flex h-12' onClick={() => setIsModalOpen(true)}>
                 <div className='px-4 py-2 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border-b-4 rounded-lg cursor-pointer text-slate-400 bg-slate-200 border-b-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white active:border-0'>
                   Create Group
                 </div>
               </div>
             }
             content={
-              <div className='flex flex-col gap-2 text-black'>
+              <div className='flex flex-col w-full gap-2 text-black '>
+                <div className='flex items-center justify-between'>
+                  <h2 className='text-lg font-bold'>Create Group</h2>
+                  <button
+                    onClick={handleCloseModal}
+                    className='text-black/50 hover:text-black'
+                  >
+                    ✕
+                  </button>
+                </div>
                 <input
                   type='text'
-                  onChange={(e) => setGroupName(e.target.value)}
+                  onChange={(e) => setGroupName(e.target.value.trimStart())}
                   placeholder='Group Name'
                   className='px-4 py-2 font-bold rounded-lg text-black/60 bg-slate-200 focus:outline-none'
                 />
@@ -175,7 +193,10 @@ const Page = () => {
                     </div>
                   </div>
                   <div
-                    onClick={handleCreateGroup}
+                    onClick={() => {
+                      handleCreateGroup();
+                      handleCloseModal();
+                    }}
                     className={`px-4 py-2 w-full text-center mt-auto font-bold uppercase transition-all duration-100 ease-in-out rounded-lg cursor-pointer ${
                       groupName.length > 0
                         ? 'bg-lime-300 border-b-4  text-lime-500 border-b-lime-400  active:text-white active:border-0 '
