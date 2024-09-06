@@ -38,7 +38,6 @@ function FoodCard({
       />
       {!adminPanel ? (
         <VoteButton
-          podium={podium}
           meal={meal}
           date={date}
           groupId={groupId}

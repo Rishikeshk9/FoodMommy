@@ -41,7 +41,17 @@ export async function saveVoteItem(voteItem, votingForDate) {
     await connectDB();
     const { foodItem, meal, voter, groupId, _id } = voteItem;
     if (!foodItem || !meal || !voter || !groupId || !votingForDate) {
-      throw new Error('Missing required fields');
+      const missingFields = [];
+      if (!foodItem) missingFields.push('foodItem');
+      if (!meal) missingFields.push('meal');
+      if (!voter) missingFields.push('voter');
+      if (!groupId) missingFields.push('groupId');
+      if (!votingForDate) missingFields.push('votingForDate');
+
+      if (missingFields.length > 0) {
+        console.log('Missing fields:', missingFields.join(', '));
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
     }
 
     // Find the existing vote item

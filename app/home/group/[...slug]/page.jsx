@@ -196,6 +196,7 @@ function Home() {
                   groupId={groupId}
                   meal={meal}
                   podium={true}
+                  date={selectedDate}
                   foodItem={highestVotedItems[meal]}
                   voteItem={
                     voteItems &&
