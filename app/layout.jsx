@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }) {
   return (
     <html lang='en'>
+      <title>Kaykhau | Simplifying Meal Decisions</title>
       <body className='scrollbar-none '>
         <SessionProvider>
           <GlobalStore>{children}</GlobalStore>{' '}
