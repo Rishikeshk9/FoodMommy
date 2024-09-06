@@ -301,7 +301,7 @@ function Home() {
           ))}
         </div>
       )}
-      <div className='flex flex-col items-center justify-center mb-12'>
+      <div className='flex flex-col items-center justify-center mb-24'>
         <p className='font-semibold text-center text-black/70'>
           Invite Your Friends for an Interesting Menu
         </p>

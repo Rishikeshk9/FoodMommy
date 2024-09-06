@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import {
   getUserItems,
   updateUserPreferences,
@@ -10,8 +9,6 @@ import { getFoodItems } from '../../../_actions/postAction';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import CircularList from '../../components/CircularList';
-import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const [user, setUser] = useState(null);
@@ -26,7 +23,6 @@ const Page = () => {
   const [isGroupsExpanded, setIsGroupsExpanded] = useState(false);
   const [isAccountSettingsExpanded, setIsAccountSettingsExpanded] =
     useState(false);
-  const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       const result = await getUserItems(session?.user?.id);
