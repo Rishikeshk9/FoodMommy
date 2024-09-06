@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 
-const Page = () => {
+export default function Page() {
   const [user, setUser] = useState(null);
   const [preferences, setPreferences] = useState({
     breakfast: [],
@@ -176,6 +176,4 @@ const Page = () => {
       </button>
     </div>
   );
-};
-
-export default Page;
+}
