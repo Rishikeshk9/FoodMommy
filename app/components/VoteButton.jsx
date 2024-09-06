@@ -38,6 +38,7 @@ function VoteButton({ itemId, meal, groupId, voteItem, date }) {
 
     saveVoteItem(voteData, date).then(async (result) => {
       if (result) {
+        console.clear();
         console.log('Vote created successfully:', result);
         // Handle success (e.g., navigate to group page, notify user)
         await fetchVotesByGroup(groupId, date);
