@@ -4,13 +4,17 @@ import FoodCard from '../../../components/FoodCard';
 import { useGlobalContext } from '../../../contexts/globalContext';
 import { IconChartBubbleFilled, IconSearch, IconX } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import { fetchGroupMembersByGroupId } from '../../../../_actions/groupAction';
+import {
+  fetchGroupMembersByGroupId,
+  getGroupById,
+} from '../../../../_actions/groupAction';
 
 function Home() {
   const { slug } = useParams();
   const groupId = slug[0];
   const { fetchFoodItems, fetchVoteItems, fetchVotesByGroup, voteItems } =
     useGlobalContext();
+  const [group, setGroup] = useState(null);
 
   const [searchQueries, setSearchQueries] = useState({
     breakfast: '',
@@ -59,6 +63,7 @@ function Home() {
     setMealItems(updatedMealItems);
 
     fetchData();
+    setGroup(await getGroupById(groupId));
   }, [groupId]);
 
   const foodIDsToObjects = useCallback(
@@ -296,6 +301,14 @@ function Home() {
           ))}
         </div>
       )}
+      <div className='flex flex-col items-center justify-center mb-12'>
+        <p className='font-semibold text-center text-black/70'>
+          Invite Your Friends for an Interesting Menu
+        </p>
+        <p className='text-center text-black/70'>
+          Group Code: {group?.groupCode}
+        </p>
+      </div>
     </>
   );
 }
