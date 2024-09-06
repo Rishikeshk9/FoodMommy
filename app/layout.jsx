@@ -14,10 +14,10 @@ export default function RootLayout({ children }) {
           <GlobalStore>{children}</GlobalStore>{' '}
         </SessionProvider>
       </body>
-      <script
+      {/* <script
         type='module'
         src='https://unpkg.com/@layflags/rolling-number@1.0.0/rolling-number.js'
-      ></script>
+      ></script> */}
     </html>
   );
 }
