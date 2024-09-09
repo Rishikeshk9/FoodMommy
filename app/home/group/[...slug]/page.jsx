@@ -2,7 +2,12 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import FoodCard from '../../../components/FoodCard';
 import { useGlobalContext } from '../../../contexts/globalContext';
-import { IconChartBubbleFilled, IconSearch, IconX } from '@tabler/icons-react';
+import {
+  IconChartBubbleFilled,
+  IconSearch,
+  IconTrophyFilled,
+  IconX,
+} from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
 import {
   fetchGroupMembersByGroupId,
@@ -38,7 +43,10 @@ function Home() {
     lunch: 0,
     dinner: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(
+    localStorage.getItem('selectedDate') ||
+      new Date().toISOString().split('T')[0]
+  );
   const fetchGroupMembers = useCallback(async () => {
     const members = await fetchGroupMembersByGroupId(groupId);
     setGroupMembers(members);
@@ -171,12 +179,12 @@ function Home() {
         <h2 className='font-semibold text-black/70'>Select Date</h2>
         <input
           type='date'
-          value={selectedDate.toISOString().split('T')[0]}
+          value={selectedDate}
           className='p-1 bg-white border rounded text-black/70 stroke-black/70 fill-black/70'
           onChange={(e) => {
-            const selectedDate = new Date(e.target.value);
-            setSelectedDate(selectedDate);
-            fetchVotesByGroup(groupId, selectedDate);
+            localStorage.setItem('selectedDate', e.target.value);
+            setSelectedDate(e.target.value);
+            fetchVotesByGroup(groupId, e.target.value);
           }}
         />
       </div>
@@ -210,7 +218,10 @@ function Home() {
                 <div className='flex flex-col gap-2 text-xs font-semibold text-center text-gray-500'>
                   No votes yet
                   <div className='flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full '>
-                    <IconChartBubbleFilled />
+                    <IconTrophyFilled />
+                  </div>
+                  <div className='flex items-center justify-center w-full h-10 bg-gray-50 '>
+                    &nbsp;
                   </div>
                 </div>
               )}

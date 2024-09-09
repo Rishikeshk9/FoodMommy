@@ -90,73 +90,92 @@ function Navbar() {
           {/* Replace the brand text with the logo image */}
           <img src='/logo.svg' alt='KayKhau Logo' className='w-auto h-5' />
         </Link>
-        <div className='flex items-center justify-between text-sm font-semibold rounded-lg'>
-          <Modal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            trigger={
-              <div
-                onClick={() => setIsModalOpen(true)}
-                className='px-2 py-1 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border rounded-lg cursor-pointer text-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white'
-              >
-                Create Group
-              </div>
-            }
-            content={
-              <div className='flex flex-col w-full gap-2 text-black '>
-                <div className='flex items-center justify-between'>
-                  <h2 className='text-lg font-bold'>Create Group</h2>
-                  <button
-                    onClick={handleCloseModal}
-                    className='text-black/50 hover:text-black'
-                  >
-                    ✕
-                  </button>
+
+        <div className='flex items-center justify-between gap-2 text-sm font-semibold rounded-lg'>
+          <div
+            onClick={async () => {
+              const groupId = prompt('Enter the group ID:');
+              if (groupId) {
+                console.log('Joining group with ID:', groupId);
+                joinGroup(groupId, session?.user?.id).then(() => {
+                  fetchUserItems(session?.user?.id).then((userData) => {
+                    fetchGroupItems(userData?.groups);
+                  });
+                });
+              }
+            }}
+            className='px-2 py-1 font-bold uppercase transition-all duration-100 ease-in-out border rounded-lg cursor-pointer text-slate-400 active:text-white hover:text-lime-600 hover:bg-lime-300 active:bg-lime-400'
+          >
+            Join Group
+          </div>
+          <div className='flex items-center justify-between text-sm font-semibold uppercase rounded-lg'>
+            <Modal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              trigger={
+                <div
+                  onClick={() => setIsModalOpen(true)}
+                  className='px-2 py-1 font-bold uppercase transition-all duration-100 ease-in-out border rounded-lg cursor-pointer text-slate-400 active:text-white hover:text-lime-600 hover:bg-lime-300 active:bg-lime-400'
+                >
+                  <IconPlus className='w-5 h-5' />
                 </div>
-                <input
-                  type='text'
-                  onChange={(e) => setGroupName(e.target.value.trimStart())}
-                  placeholder='Group Name'
-                  className='px-4 py-2 font-bold rounded-lg text-black/60 bg-slate-200 focus:outline-none'
-                />
-                <div className='flex justify-between w-full h-12'>
-                  <div className='flex items-center w-full align-middle '>
-                    <div className='flex items-center'>
-                      <div
-                        onClick={() => setAnyoneCanJoin(!anyoneCanJoin)}
-                        className='w-6 h-6 bg-gray-200 rounded-md'
-                      >
-                        {anyoneCanJoin ? (
-                          <IconSquareCheckFilled className='w-6 h-6 text-lime-500' />
-                        ) : (
-                          ''
-                        )}
+              }
+              content={
+                <div className='flex flex-col w-full gap-2 text-black '>
+                  <div className='flex items-center justify-between'>
+                    <h2 className='text-lg font-bold'>Create Group</h2>
+                    <button
+                      onClick={handleCloseModal}
+                      className='text-black/50 hover:text-black'
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <input
+                    type='text'
+                    onChange={(e) => setGroupName(e.target.value.trimStart())}
+                    placeholder='Group Name'
+                    className='px-4 py-2 font-bold rounded-lg text-black/60 bg-slate-200 focus:outline-none'
+                  />
+                  <div className='flex justify-between w-full h-12'>
+                    <div className='flex items-center w-full align-middle '>
+                      <div className='flex items-center'>
+                        <div
+                          onClick={() => setAnyoneCanJoin(!anyoneCanJoin)}
+                          className='w-6 h-6 bg-gray-200 rounded-md'
+                        >
+                          {anyoneCanJoin ? (
+                            <IconSquareCheckFilled className='w-6 h-6 text-lime-500' />
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                        <label
+                          htmlFor='anyoneCanJoin'
+                          className='ml-2 text-sm font-medium text-black/50'
+                        >
+                          Anyone can join
+                        </label>
                       </div>
-                      <label
-                        htmlFor='anyoneCanJoin'
-                        className='ml-2 text-sm font-medium text-black/50'
-                      >
-                        Anyone can join
-                      </label>
+                    </div>
+                    <div
+                      onClick={() => {
+                        handleCreateGroup();
+                        handleCloseModal();
+                      }}
+                      className={`px-4 py-2 w-full text-center mt-auto font-bold uppercase transition-all duration-100 ease-in-out rounded-lg cursor-pointer ${
+                        groupName.length > 0
+                          ? 'bg-lime-300 border-b-4  text-lime-500 border-b-lime-400  active:text-white active:border-0 '
+                          : 'text-slate-400 bg-slate-100'
+                      }`}
+                    >
+                      Create
                     </div>
                   </div>
-                  <div
-                    onClick={() => {
-                      handleCreateGroup();
-                      handleCloseModal();
-                    }}
-                    className={`px-4 py-2 w-full text-center mt-auto font-bold uppercase transition-all duration-100 ease-in-out rounded-lg cursor-pointer ${
-                      groupName.length > 0
-                        ? 'bg-lime-300 border-b-4  text-lime-500 border-b-lime-400  active:text-white active:border-0 '
-                        : 'text-slate-400 bg-slate-100'
-                    }`}
-                  >
-                    Create
-                  </div>
                 </div>
-              </div>
-            }
-          />
+              }
+            />
+          </div>
         </div>
       </div>
     </nav>

@@ -118,24 +118,7 @@ const Page = () => {
             </div>
           </>
         ))}
-      <div className='absolute flex items-center justify-center w-full h-12 bottom-16 '>
-        <div
-          onClick={async () => {
-            const groupId = prompt('Enter the group ID:');
-            if (groupId) {
-              console.log('Joining group with ID:', groupId);
-              joinGroup(groupId, session?.user?.id).then(() => {
-                fetchUserItems(session?.user?.id).then((userData) => {
-                  fetchGroupItems(userData?.groups);
-                });
-              });
-            }
-          }}
-          className='px-4 py-2 mt-auto font-bold uppercase transition-all duration-100 ease-in-out border-b-4 rounded-lg cursor-pointer text-slate-400 bg-slate-200 border-b-slate-400 hover:bg-slate-300 active:bg-slate-400 active:text-white active:border-0'
-        >
-          Join Group
-        </div>
-      </div>
+      <div className='absolute flex items-center justify-center w-full h-12 bottom-16 '></div>
       {/* Second Part */}
       {groupItems.length === 0 && (
         <div className='flex flex-col items-center justify-center h-full gap-2'>
